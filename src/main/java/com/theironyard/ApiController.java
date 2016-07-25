@@ -1,5 +1,7 @@
 package com.theironyard;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +56,7 @@ public class ApiController {
     }
 
     @RequestMapping(path = "/quote", method = RequestMethod.GET)
-    public ArrayList getQuote() throws InterruptedException, ExecutionException {
+    public ResponseEntity getQuote() throws InterruptedException, ExecutionException {
         Future<HashMap> quote1 = requestQuote();
         Future<HashMap> quote2 = requestQuote();
         Future<HashMap> quote3 = requestQuote();
@@ -68,7 +70,11 @@ public class ApiController {
         arr.add(quote2.get());
         arr.add(quote3.get());
 
+        if(arr.contains(null)) {
+            return new ResponseEntity("we messed up", HttpStatus.SERVICE_UNAVAILABLE);
+        }
 
-        return null;
+
+        return new ResponseEntity(arr, HttpStatus.OK);
     }
 }
